@@ -1,13 +1,13 @@
 # Beschreibung:
 Dieses PowerShell-Skript implementiert den Winget Offline-Downloader mit einer grafischen Benutzeroberfläche (Windows Forms) im Dark Mode. Es ermöglicht das Suchen von Windows-Paketen über winget, das Verwalten einer Paketliste in einer apps.json sowie das Herunterladen von .exe- und .msi-Installern inklusive automatischem Aufräumen alter Versionen.
 
-<img width="819" height="518" alt="image" src="https://github.com/user-attachments/assets/d661524f-06a8-47a1-99ab-bcf1fb45e03d" />
-
+<img width="813" height="514" alt="image" src="https://github.com/user-attachments/assets/2675c0ea-1aa6-434d-87b7-24b71dae9f2e" />
+*
 <img width="814" height="515" alt="image" src="https://github.com/user-attachments/assets/3720092a-2ea7-404e-a6b4-2a3cf9bce8f9" />
 
 
 ## Überblick & Funktionsweise:
-Konfiguration über apps.json: Beim Start ermittelt das Skript sein eigenes Verzeichnis ($baseDir) und lädt daraus die Datei apps.json. Existiert diese nicht oder ist sie leer/ungültig, wird sie automatisch mit dem Standardpaket 7zip.7zip angelegt und als UTF-8 mit BOM gespeichert.
+**Konfiguration über apps.json:** Beim Start ermittelt das Skript sein eigenes Verzeichnis ($baseDir) und lädt daraus die Datei apps.json. Existiert diese nicht oder ist sie leer/ungültig, wird sie automatisch mit dem Standardpaket 7zip.7zip angelegt und als UTF-8 mit BOM gespeichert.
 
 **Asynchroner Download ohne UI-Freeze:** Downloads werden über Start-Process -FilePath "winget.exe" ... -WindowStyle Hidden in ein temporäres Unterverzeichnis (temp_<Paketname>) gestartet. Ein System.Windows.Forms.Timer prüft alle 200 ms, ob der Prozess noch läuft, damit die Oberfläche bedienbar bleibt und per Stop-Button abgebrochen werden kann.
 
@@ -16,18 +16,16 @@ Konfiguration über apps.json: Beim Start ermittelt das Skript sein eigenes Verz
 **Winget-Suche & Parser:** Im zweiten Tab führt winget search eine Suche aus und parst die Konsolenausgabe zeilenweise (Parse-WingetSearchOutput), um Programmname, Winget-ID und Version in einem DataGridView darzustellen.
 
 ## Aufbau des Skripts:
-Initialisierung & JSON-Verwaltung (Write-AppsJson, Read-AppsJson)
-
+**Initialisierung & JSON-Verwaltung (Write-AppsJson, Read-AppsJson):**
 Setzt UTF-8-Encoding für die Konsole, lädt System.Windows.Forms und System.Drawing und initialisiert die Paketliste.
-
 GUI-Definition ($form, $tabs)
 
-**Tab „Downloader“:** CheckedListBox für die Auswahl der Pakete, Buttons für Alle an-/abwählen, Download starten und Stop, ein Protokollfeld ($txtLog) sowie eine Fortschrittsanzeige ($progressBar).
+**Tab „Downloader“:** 
+CheckedListBox für die Auswahl der Pakete, Buttons für Alle an-/abwählen, Download starten und Stop, ein Protokollfeld ($txtLog) sowie eine Fortschrittsanzeige ($progressBar).
 
-**Tab „Datenbank & Winget-Suche“:** Suchfeld + DataGridView für Suchergebnisse, Button zum Hinzufügen zur apps.json sowie eine ListBox zum Entfernen gespeicherter Pakete.
+**Tab „Datenbank & Winget-Suche“:** 
+Suchfeld + DataGridView für Suchergebnisse, Button zum Hinzufügen zur apps.json sowie eine ListBox zum Entfernen gespeicherter Pakete.
 
 **Footer:** Zeigt den Entwicklernamen an.
-
 Download-Steuerung & Abbruchlogik (Start-NextAppInQueue, $timer.Add_Tick, Finish-DownloadSession, Kill-WingetNow)
-
 Verwaltet die Warteschlange ($script:dlQueue), löscht beim Beenden/Abbrechen temporäre Ordner sowie übrig gebliebene .yaml-Dateien im Basisverzeichnis und beendet bei Bedarf laufende winget-/AppInstaller-Prozesse.
